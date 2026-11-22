@@ -46,6 +46,7 @@
   .theme-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
   .theme{appearance:none;cursor:pointer;background:#fff;border:2px solid var(--line);border-radius:16px;
     padding:14px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--ink);
+    position:relative;
     transition:border-color .15s, box-shadow .15s, background .15s}
   .theme .ticon{font-size:32px;line-height:1}
   .theme .ttext{display:flex;flex-direction:column;align-items:center;gap:2px}
@@ -53,7 +54,9 @@
   .theme .tdesc{font-size:.8rem;color:var(--ink2);line-height:1.35;word-break:keep-all;text-align:center}
   .theme[aria-pressed="true"]{border-color:var(--gold);background:linear-gradient(180deg,#fffaef,#fdefd6);
     box-shadow:0 0 0 3px rgba(198,154,63,.22)}
-  .theme[aria-pressed="true"] .tname::after{content:" ✓";color:var(--ok)}
+  .tcheck{display:none;position:absolute;top:8px;right:9px;width:26px;height:26px;border-radius:50%;
+    background:#1d7a52;color:#fff;font-size:16px;font-weight:900;line-height:26px;text-align:center}
+  .theme[aria-pressed="true"] .tcheck{display:block}
 
   .field{margin-bottom:14px}
   .field:last-child{margin-bottom:0}
@@ -171,14 +174,17 @@
         <button type="button" class="theme" data-theme="award" aria-pressed="false">
           <span class="ticon">🏆</span>
           <span class="ttext"><span class="tname">어워즈</span><span class="tdesc">시상식 무대, 금빛 조명</span></span>
+          <span class="tcheck" aria-hidden="true">✓</span>
         </button>
         <button type="button" class="theme" data-theme="toast" aria-pressed="false">
           <span class="ticon">🥂</span>
           <span class="ttext"><span class="tname">건배</span><span class="tdesc">송년회 건배사, 불빛과 눈꽃</span></span>
+          <span class="tcheck" aria-hidden="true">✓</span>
         </button>
         <button type="button" class="theme" data-theme="thanks" aria-pressed="true">
           <span class="ticon">💐</span>
           <span class="ttext"><span class="tname">명단 감사</span><span class="tdesc">회원 명단, 한지와 금빛</span></span>
+          <span class="tcheck" aria-hidden="true">✓</span>
         </button>
       </div>
     </div>
