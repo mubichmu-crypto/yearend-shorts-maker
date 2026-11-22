@@ -571,7 +571,7 @@ function drawPhotos(t){
   var n = S.photos.length, per = 6;
   var idx = Math.floor(t/per) % n, next = (idx+1) % n;
   var local = t % per, fadeStart = per - 1.2;
-  var alphaPhoto = (S.theme === 'thanks') ? 0.55 : 0.5;
+  var alphaPhoto = (S.theme === 'thanks') ? 0.42 : 0.46;
   ctx.save();
   if (n > 1 && local > fadeStart){
     var pp = easeInOut((local - fadeStart)/1.2);
@@ -590,6 +590,18 @@ function drawPhotos(t){
     g.addColorStop(0,'rgba(6,5,10,0.84)'); g.addColorStop(.45,'rgba(12,9,16,0.58)'); g.addColorStop(1,'rgba(4,3,6,0.90)');
   }
   ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+  // 글자가 놓이는 가운데를 한 번 더 덮어 읽기 쉽게
+  var rgc = ctx.createRadialGradient(W/2, H*0.47, 30, W/2, H*0.47, W*0.72);
+  if (S.theme === 'thanks'){
+    rgc.addColorStop(0,'rgba(252,242,222,0.60)');
+    rgc.addColorStop(.65,'rgba(250,236,212,0.28)');
+    rgc.addColorStop(1,'rgba(248,232,205,0)');
+  } else {
+    rgc.addColorStop(0,'rgba(8,6,10,0.42)');
+    rgc.addColorStop(.65,'rgba(10,7,12,0.18)');
+    rgc.addColorStop(1,'rgba(10,7,12,0)');
+  }
+  ctx.fillStyle = rgc; ctx.fillRect(0,0,W,H);
 }
 function drawOnePhoto(img, alpha, t){
   var f = coverFit(img);
@@ -782,7 +794,7 @@ function drawBouquet(cx, cy, s, alpha){
   });
   // 꽃 세 송이
   var cols = [['#e8a2a8','#c76b74'],['#f2c98a','#d9a24a'],['#e6b7d4','#bb7ea8']];
-  var pos = [[-0.30,-0.18,0.30],[0.30,-0.06,0.27],[0.0,-0.40,0.33]];
+  var pos = [[-0.36,-0.02,0.27],[0.34,0.04,0.25],[0.0,-0.36,0.30]];
   pos.forEach(function(p,i){
     var g = ctx.createRadialGradient(cx + p[0]*s, cy + p[1]*s, 0, cx + p[0]*s, cy + p[1]*s, s*p[2]);
     g.addColorStop(0, cols[i][0]); g.addColorStop(1, cols[i][1]);
@@ -1274,15 +1286,15 @@ function drawPlaque(x, y, w, h, name, appear, extra, C){
 function drawPageDots(range, C){
   var count = TL.ranges.length;
   if (count <= 1) return;
-  var gap = 22;
+  var gap = 30;
   var totalW = (count-1)*gap;
   var x0 = W/2 - totalW/2;
   for (var i=0;i<count;i++){
     ctx.beginPath();
-    var r = (i === range.index) ? 8 : 4.5;
-    ctx.fillStyle = (i === range.index) ? C.gold : C.faint;
-    ctx.globalAlpha = (i === range.index) ? 0.95 : 0.4;
-    ctx.arc(x0 + i*gap, H-186, r, 0, 6.284);
+    var on = (i === range.index);
+    ctx.fillStyle = on ? C.gold : 'rgba(110,85,55,0.55)';
+    ctx.globalAlpha = on ? 1 : 0.75;
+    ctx.arc(x0 + i*gap, H-192, on ? 11 : 7.5, 0, 6.284);
     ctx.fill();
   }
   ctx.globalAlpha = 1;
@@ -1611,7 +1623,7 @@ function finishPlayback(byUser){
   if (rafId){ cancelAnimationFrame(rafId); rafId = null; }
   stopMusic();
   el('btnPlay').textContent = '▶ 숏폼 재생하기';
-  el('idleHint').style.opacity = '';
+  el('idleHint').style.opacity = byUser ? '' : '0';
   if (S.recording) stopRecording();
   if (document.fullscreenElement){ try{ document.exitFullscreen(); }catch(e){} }
   exitTheater();
