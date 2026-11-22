@@ -23,7 +23,8 @@
   header.top{background:radial-gradient(120% 150% at 50% 0%, #8d2b3a 0%, #5c1622 55%, #390c14 100%);
     color:#fff;padding:28px 18px 32px;text-align:center;border-bottom:4px solid var(--gold)}
   .kicker{font-size:15px;letter-spacing:2px;color:#f3d79a;font-weight:700}
-  header.top h1{font-size:clamp(25px,4.6vw,37px);font-weight:900;margin:8px 0 10px;line-height:1.28;color:#fff8e9}
+  header.top h1{font-size:clamp(25px,4.6vw,37px);font-weight:900;margin:8px 0 10px;line-height:1.28;color:#fff8e9;
+    word-break:keep-all;overflow-wrap:break-word}
   header.top .sub{font-size:clamp(15px,2.4vw,18px);color:#f7e5c9;max-width:660px;margin:0 auto;line-height:1.55}
 
   .layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,420px);gap:24px;
@@ -135,7 +136,7 @@
   body.theater{overflow:hidden}
   body.theater .stage-wrap{position:fixed;inset:0;z-index:90;background:#080506;display:flex;flex-direction:column;
     align-items:center;justify-content:center;padding:0;gap:0;max-width:none}
-  body.theater .phone{width:auto;height:calc(100vh - 118px);height:calc(100dvh - 118px);max-width:100vw;border-radius:0;box-shadow:none;max-height:none}
+  body.theater .phone{width:auto;height:auto;max-width:100vw;border-radius:0;box-shadow:none;max-height:none}
   body.theater .progress{margin:8px auto 0;max-width:min(82vw,420px)}
   body.theater .actions{flex-direction:row;flex-wrap:wrap;justify-content:center;margin-top:10px;gap:8px}
   body.theater .actions .row{display:flex;gap:8px}
@@ -150,7 +151,6 @@
     .theme{flex-direction:row;justify-content:flex-start;text-align:left;gap:14px;padding:14px 16px}
     .theme .ttext{align-items:flex-start}
     .theme .tdesc{text-align:left}
-    body.theater .phone{height:calc(100vh - 150px);height:calc(100dvh - 150px)}
   }
 </style>
 </head>
@@ -1732,8 +1732,23 @@ function stopRecording(){
 }
 
 /* ===== 화면·전체화면 ===== */
-function enterTheater(){ document.body.classList.add('theater'); }
-function exitTheater(){ document.body.classList.remove('theater'); }
+function enterTheater(){ document.body.classList.add('theater'); fitStage(); }
+function exitTheater(){ document.body.classList.remove('theater'); fitStage(); }
+/* 화면을 가득 채우는 모드에서 영상 크기를 화면에 꼭 맞춘다 */
+function fitStage(){
+  var ph = el('phone');
+  if (!ph) return;
+  if (!document.body.classList.contains('theater')){
+    ph.style.height = ''; ph.style.width = '';
+    return;
+  }
+  var availH = Math.max(240, window.innerHeight - 168);
+  var availW = Math.max(200, window.innerWidth - 8);
+  var h = Math.min(availH, availW*16/9);
+  var w = h*9/16;
+  ph.style.height = Math.round(h) + 'px';
+  ph.style.width = Math.round(w) + 'px';
+}
 function closeTheater(){
   if (document.fullscreenElement){ try{ document.exitFullscreen(); }catch(e){} }
   exitTheater();
@@ -1926,7 +1941,7 @@ function initUI(){
   var rz;
   window.addEventListener('resize', function(){
     clearTimeout(rz);
-    rz = setTimeout(function(){ if (!S.playing) drawIdle(); }, 200);
+    rz = setTimeout(function(){ fitStage(); if (!S.playing) drawIdle(); }, 200);
   });
   document.addEventListener('visibilitychange', function(){
     if (document.hidden && S.recording){ /* 녹화는 계속 */ }
