@@ -114,9 +114,19 @@
     line-height:1.45;text-align:center;font-weight:700}
   .tiny{font-size:.86rem;color:var(--ink2);margin-top:10px;line-height:1.5}
 
-  footer.foot{max-width:1200px;margin:0 auto;padding:10px 20px 46px;text-align:center;color:#8a7161;font-size:.92rem}
-  footer.foot b{color:#7a2230}
+  footer.foot{max-width:1200px;margin:0 auto;padding:10px 20px 46px;text-align:center;color:#8a7161;font-size:.92rem}  footer.foot b{color:#7a2230}
   footer.foot .mini{margin-top:10px}
+
+  /* 휴대폰에서는 화면 아래에 재생 버튼을 항상 둔다 */
+  .mobilebar{display:none}
+  @media (max-width:920px){
+    body{padding-bottom:88px}
+    .mobilebar{display:block;position:fixed;left:0;right:0;bottom:0;z-index:60;
+      background:rgba(253,246,236,.97);border-top:2px solid #e8dbc6;
+      padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));box-shadow:0 -6px 18px rgba(90,50,20,.12)}
+    .mobilebar .btn{width:100%}
+    body.theater .mobilebar{display:none}
+  }
 
   /* 극장(전체화면) 모드 */
   body.theater{overflow:hidden}
@@ -268,6 +278,10 @@
 </footer>
 
 <button type="button" class="btn ghost" id="btnCloseTheater">✕ 닫기</button>
+
+<div class="mobilebar" id="mobileBar">
+  <button type="button" class="btn gold big" id="btnPlayMobile">▶ 숏폼 재생하기</button>
+</div>
 
 <script>
 (function(){
@@ -1588,13 +1602,18 @@ function rebuild(){
   TL = buildTimeline();
 }
 
+function setPlayLabel(txt){
+  el('btnPlay').textContent = txt;
+  if (el('btnPlayMobile')) el('btnPlayMobile').textContent = txt;
+}
+
 function startPlayback(record){
   if (S.playing) return;
   rebuild();
   S.playing = true;
   document.body.classList.add('playing');
   el('idleHint').style.opacity = '0';
-  el('btnPlay').textContent = record ? '⏹ 저장 마치기' : '⏹ 멈추기';
+  setPlayLabel(record ? '⏹ 저장 마치기' : '⏹ 멈추기');
   el('bar').style.width = '0%';
   ensureAudio();
   if (ensureAudio() && actx.state === 'suspended') actx.resume();
@@ -1623,6 +1642,7 @@ function finishPlayback(byUser){
   if (rafId){ cancelAnimationFrame(rafId); rafId = null; }
   stopMusic();
   el('btnPlay').textContent = '▶ 숏폼 재생하기';
+  setPlayLabel('▶ 숏폼 재생하기');
   el('idleHint').style.opacity = byUser ? '' : '0';
   if (S.recording) stopRecording();
   if (document.fullscreenElement){ try{ document.exitFullscreen(); }catch(e){} }
@@ -1868,6 +1888,7 @@ function initUI(){
     startPlayback(true);
   });
   el('btnFull').addEventListener('click', toggleFullscreen);
+  el('btnPlayMobile').addEventListener('click', function(){ el('btnPlay').click(); });
   el('btnCloseTheater').addEventListener('click', function(){
     if (document.fullscreenElement) document.exitFullscreen().catch(function(){});
     exitTheater();
