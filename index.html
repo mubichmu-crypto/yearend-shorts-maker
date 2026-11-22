@@ -140,6 +140,8 @@
   body.theater .len-note, body.theater .tiny{display:none}
   #btnCloseTheater{display:none;position:fixed;top:12px;right:12px;z-index:95}
   body.theater #btnCloseTheater{display:block}
+  #btnCloseTheater2{display:none;position:fixed;top:12px;right:12px;z-index:96}
+  body.theater #btnCloseTheater2{display:block}
   @media (max-width:560px){
     .theme-grid{grid-template-columns:1fr}
     .theme{flex-direction:row;justify-content:flex-start;text-align:left;gap:14px;padding:14px 16px}
@@ -258,6 +260,7 @@
       <canvas id="cv" width="1080" height="1920" aria-label="숏폼 미리보기 화면"></canvas>
       <div class="rec-badge" id="recBadge">● 녹화 중</div>
       <div class="idle-hint" id="idleHint">▶ 를 누르면 움직여요</div>
+      <button type="button" class="btn ghost" id="btnCloseTheater2">✕ 닫기</button>
     </div>
     <div class="progress"><i id="bar"></i></div>
     <div class="actions">
@@ -1196,9 +1199,11 @@ function drawAwardSolo(name, lt, pageDur, C){
   ctx.strokeStyle = 'rgba(243,205,106,0.9)';
   ctx.lineWidth = 4;
   [-1,1].forEach(function(dir){
+    ctx.globalAlpha *= 0.55;
     ctx.beginPath();
     ctx.arc(W/2 + dir*170, by + bh*0.5, 170, dir<0 ? Math.PI*0.62 : Math.PI*0.38, dir<0 ? Math.PI*1.38 : Math.PI*0.62, dir<0);
     ctx.stroke();
+    ctx.globalAlpha /= 0.55;
   });
   ctx.restore();
 
@@ -1723,16 +1728,17 @@ function stopRecording(){
 /* ===== 화면·전체화면 ===== */
 function enterTheater(){ document.body.classList.add('theater'); }
 function exitTheater(){ document.body.classList.remove('theater'); }
+function closeTheater(){
+  if (document.fullscreenElement){ try{ document.exitFullscreen(); }catch(e){} }
+  exitTheater();
+  if (S.playing) finishPlayback(true); else drawIdle();
+}
 function toggleFullscreen(){
   var box = el('stageWrap');
-  if (document.fullscreenElement){
-    document.exitFullscreen().catch(function(){});
-    return;
-  }
+  if (document.fullscreenElement || document.body.classList.contains('theater')){ closeTheater(); return; }
+  enterTheater();
   if (box.requestFullscreen){
-    box.requestFullscreen().catch(function(){ enterTheater(); });
-  } else {
-    enterTheater();
+    box.requestFullscreen().catch(function(){ /* 전체화면이 안 되면 화면을 가득 채우는 모드로 */ });
   }
 }
 
@@ -1889,11 +1895,10 @@ function initUI(){
   });
   el('btnFull').addEventListener('click', toggleFullscreen);
   el('btnPlayMobile').addEventListener('click', function(){ el('btnPlay').click(); });
-  el('btnCloseTheater').addEventListener('click', function(){
-    if (document.fullscreenElement) document.exitFullscreen().catch(function(){});
-    exitTheater();
-    if (S.playing) finishPlayback(true);
-    else drawIdle();
+  el('btnCloseTheater').addEventListener('click', closeTheater);
+  el('btnCloseTheater2').addEventListener('click', closeTheater);
+  document.addEventListener('fullscreenchange', function(){
+    if (!document.fullscreenElement) exitTheater();
   });
 
   // 주소 복사
