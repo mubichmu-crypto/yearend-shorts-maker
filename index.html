@@ -411,7 +411,7 @@ function paginate(items){
 function layoutFor(n){
   if (n <= 1) return {cols:1, rows:1};
   if (n <= 4) return {cols:2, rows:Math.ceil(n/2)};
-  if (n <= 9) return {cols:3, rows:Math.ceil(n/3)};
+  if (n <= 12) return {cols:3, rows:Math.ceil(n/3)};
   return {cols:4, rows:Math.ceil(n/4)};
 }
 
@@ -682,19 +682,19 @@ function drawLeaf(x, y, size, rot, color, alpha, kind){
     ctx.strokeStyle = 'rgba(120,70,30,0.5)'; ctx.lineWidth = 2;
     ctx.beginPath(); ctx.moveTo(0,size*0.9); ctx.lineTo(0,size*0.2); ctx.stroke();
   } else {
-    // 단풍잎(간단한 5각)
+    // 단풍잎(굴곡 있는 잎 모양)
     ctx.beginPath();
-    for (var i=0;i<5;i++){
-      var a1 = -Math.PI/2 + (i*2*Math.PI/5) - 0.42;
-      var a2 = -Math.PI/2 + (i*2*Math.PI/5);
-      var a3 = -Math.PI/2 + (i*2*Math.PI/5) + 0.42;
-      ctx.lineTo(Math.cos(a1)*size*0.45, Math.sin(a1)*size*0.45);
-      ctx.lineTo(Math.cos(a2)*size, Math.sin(a2)*size);
-      ctx.lineTo(Math.cos(a3)*size*0.45, Math.sin(a3)*size*0.45);
-    }
+    ctx.moveTo(0, size*1.0);
+    ctx.bezierCurveTo(-size*0.20, size*0.55, -size*0.42, size*0.50, -size*0.36, size*0.20);
+    ctx.bezierCurveTo(-size*0.72, size*0.26, -size*0.86, -size*0.02, -size*0.58, -size*0.18);
+    ctx.bezierCurveTo(-size*0.72, -size*0.48, -size*0.44, -size*0.72, -size*0.20, -size*0.56);
+    ctx.bezierCurveTo(-size*0.10, -size*0.86, size*0.10, -size*0.86, size*0.20, -size*0.56);
+    ctx.bezierCurveTo(size*0.44, -size*0.72, size*0.72, -size*0.48, size*0.58, -size*0.18);
+    ctx.bezierCurveTo(size*0.86, -size*0.02, size*0.72, size*0.26, size*0.36, size*0.20);
+    ctx.bezierCurveTo(size*0.42, size*0.50, size*0.20, size*0.55, 0, size*1.0);
     ctx.closePath(); ctx.fill();
-    ctx.strokeStyle = 'rgba(120,60,30,0.45)'; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(0,size*0.3); ctx.lineTo(0,size*1.05); ctx.stroke();
+    ctx.strokeStyle = 'rgba(110,50,20,0.45)'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(0,size*0.95); ctx.lineTo(0,-size*0.3); ctx.stroke();
   }
   ctx.restore();
 }
@@ -1016,7 +1016,7 @@ function drawToastPage(range, lt, pageDur, C){
   ctx.fillText('“', W/2, 470);
   ctx.restore();
 
-  var fs = 86, lines = wrapText(line, 780, fs, 800);
+  var fs = 92, lines = wrapText(line, 790, fs, 800);
   while (lines.length > 4 && fs > 42){ fs -= 4; lines = wrapText(line, 780, fs, 800); }
   var lineH = fs * 1.36;
   var blockH = lines.length * lineH;
@@ -1083,8 +1083,8 @@ function drawNameGrid(range, lt, pageDur, C){
   var areaW = W - sideMargin*2;
   var areaH = areaBottom - areaTop;
   var cw = (areaW - gapX*(cols-1)) / cols;
-  var maxCellH = award ? 320 : 214;
-  var ch = Math.min(maxCellH, (areaH - gapY*(rows-1)) / rows);
+  var maxCellH = award ? 320 : 268;
+  var ch = Math.min(maxCellH, cw*1.2, (areaH - gapY*(rows-1)) / rows);
   var gridH = rows*ch + gapY*(rows-1);
   var startY = areaTop + Math.max(0, (areaH - gridH)/2);
 
