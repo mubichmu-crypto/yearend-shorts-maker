@@ -1736,13 +1736,14 @@ function enterTheater(){ document.body.classList.add('theater'); fitStage(); }
 function exitTheater(){ document.body.classList.remove('theater'); fitStage(); }
 /* 화면을 가득 채우는 모드에서 영상 크기를 화면에 꼭 맞춘다 */
 function fitStage(){
-  var ph = el('phone');
-  if (!ph) return;
+  var ph = el('phone'), wrap = el('stageWrap');
+  if (!ph || !wrap) return;
   if (!document.body.classList.contains('theater')){
-    ph.style.height = ''; ph.style.width = '';
+    ph.style.height = ''; ph.style.width = ''; wrap.style.height = '';
     return;
   }
-  var availH = Math.max(240, window.innerHeight - 168);
+  wrap.style.height = window.innerHeight + 'px';
+  var availH = Math.max(240, window.innerHeight - 214);
   var availW = Math.max(200, window.innerWidth - 8);
   var h = Math.min(availH, availW*16/9);
   var w = h*9/16;
